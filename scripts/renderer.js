@@ -25,8 +25,17 @@ class Renderer {
                         CG.Vector3(400, 450, 1),
                         CG.Vector3(300, 300, 1)
                     ],
-                    // scale[scale in x/sec, scale in y/sec], rotate[theda], and translate values[change in x/sec, change in y/sec].
-                    transform: [[0, 0], [0], [5, 4]]
+
+                    // the transformed values
+                    transform: null,
+                    
+                    //add velocitys and stuff in extra object atributes
+                    velocity: [10, 20], 
+
+                    rotations: [0],
+                    
+                    resize:[0, 0]
+
                 }
             ],
             slide1: [],
@@ -90,18 +99,16 @@ class Renderer {
 
         // not working yet need to make sure its on the right path.
         let vert = this.vertices;
-        let sx = this.transform[0[0]] * time;
-        let sy = this.transform[0[1]] * time;
-        let theda = this.transform[1] * time;
-        let tx = this.transform[2[0]] * time;
-        let ty = this.transform[2[1]] * time;
+        let sx = this.velocity[0] * time;
+        let sy = this.velocity[1] * time;
+        let theda = this.rotation[0] * time;
+        let tx = this.velocity[0] * time;
+        let ty = this.velocity[1] * time;
         let mat3x3 = [[0,0,0],[0,0,0],[0,0,0]];
         let scale = CG.mat3x3Scale(mat3x3,sx,sy);
         let rotate = CG.mat3x3Rotate(mat3x3,theda);
         let translate = CG.mat3x3Translate(mat3x3,tx,ty);
-        for(let i = 0; i < vert.length; i++){
-            
-        }
+        this.transform = scale * rotate * translate; 
     }
     
     //
@@ -128,11 +135,14 @@ class Renderer {
     drawSlide0() {
         // TODO: draw bouncing ball (circle that changes direction whenever it hits an edge)
          let teal = [0, 128, 128, 255];
-        this.drawConvexPolygon(this.models.slide0[0].vertices.animate, teal)
-        
+         let transformedVerticies = [];
+         for(let i = 0; i < this.models.slide0[0].vertices.length; i++){
+            transformedVerticies.push(this.models.slide0[0].transform * this.models.slide0[0].vertices[i]);
+         }
+         this.drawConvexPolygon(transformedVerticies, teal);
         // Following lines are example of drawing a single polygon
         // (this should be removed/edited after you implement the slide)
-        //this.drawConvexPolygon(this.models.slide0[0].vertices, teal);
+        this.drawConvexPolygon(this.models.slide0[0].vertices, teal);
     }
 
     //
