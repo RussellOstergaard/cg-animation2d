@@ -169,7 +169,29 @@ class Renderer {
  
                 },
             ],
-            slide3: []
+            slide3: [
+                {
+                    // need to put at orgin then rotate then transform.
+                    vertices: [
+                        CG.Vector3(0, -150, 1),
+                        CG.Vector3(100, 0, 1),
+                        CG.Vector3(0, 150, 1),
+                        CG.Vector3(-100, 0, 1)
+                    ],
+                     // the transformed values
+                     transform: null,
+                    
+                     // [x,y] velocity
+                     velocity: [0, 0], 
+                     // rotation speed
+                     rotations: [0.005],
+                     // resize speed
+                     resize:[0, 0],
+                     // counter for rotation
+                    counter: [0]
+ 
+                }
+            ]
         };
     }
     
@@ -277,14 +299,14 @@ class Renderer {
                 console.log(this.models.slide2[0].counter[0])
                 if(this.models.slide2[0].counter[0] > 10){
                     if(this.models.slide2[0].resize[0] > 1){
-                        this.models.slide2[0].resize[0] = 0.0009;
-                        this.models.slide2[0].resize[1] = 0.0009;
-                        this.models.slide2[1].resize[1] = 0.0009;
+                        this.models.slide2[0].resize[0] = 0.99999;
+                        this.models.slide2[0].resize[1] = 0.99999;
+                        this.models.slide2[1].resize[1] = 0.99999;
                     }
                     else{
-                        this.models.slide2[0].resize[0] = 1.0001;
-                        this.models.slide2[0].resize[1] = 1.0001;
-                        this.models.slide2[1].resize[1] = 1.0001;
+                        this.models.slide2[0].resize[0] = 1.00001;
+                        this.models.slide2[0].resize[1] = 1.00001;
+                        this.models.slide2[1].resize[1] = 1.00001;
                     }
                     this.models.slide2[0].counter[0] = 0;
                 }
@@ -309,7 +331,22 @@ class Renderer {
                 break;
 
             case 3:
-
+                if(this.models.slide3[0].counter[0] > 10){
+                    if(this.models.slide3[0].rotations[0] < 0){
+                        this.models.slide3[0].rotations[0] = 0.005;
+                    }
+                    else{
+                        this.models.slide3[0].rotations[0] = (0-0.005);
+                    }
+                    this.models.slide3[0].counter[0] = 0;
+                }
+                theda = this.models.slide3[0].rotations[0] * time;
+                CG.mat3x3Rotate(rotate,theda);
+                CG.mat3x3Translate(translate, 200, 200);
+                CG.mat3x3Scale(stretch,1.2, 1.4);
+                //console.log(mat3x3);
+                mat3x3 = Matrix.multiply([translate, rotate, stretch]);
+                this.models.slide3[0].transform = mat3x3;
                 break;
 
         }
@@ -368,6 +405,7 @@ class Renderer {
 
     //
     drawSlide1() {
+        // Done
         // TODO: draw at least 3 polygons that spin about their own centers
         //   - have each polygon spin at a different speed / direction
         let teal = [0, 128, 128, 255];
@@ -429,10 +467,20 @@ class Renderer {
 
     //
     drawSlide3() {
+        // works could be better but has all three transformations technically
         // TODO: get creative!
         //   - animation should involve all three basic transformation types
         //     (translation, scaling, and rotation)
-        
+        let teal = [0, 128, 128, 255];
+        let transformedVerticies = [];
+    
+        // polygon 1
+        for(let i = 0; i < this.models.slide3[0].vertices.length; i++){
+            //console.log(this.models.slide3[0].transform)
+            transformedVerticies.push(Matrix.multiply([this.models.slide3[0].transform, this.models.slide1[0].vertices[i]]));
+            //console.log(transformedVerticies);
+        }
+        this.drawConvexPolygon(transformedVerticies, teal);
         
     }
     
